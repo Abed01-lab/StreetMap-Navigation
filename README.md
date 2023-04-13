@@ -44,3 +44,71 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+
+
+## Creating graph projection for dijkstra
+
+```
+CALL gds.graph.project("route",
+{Point:{properties:["latitude","longitude"]}},
+{CONNECTED_TO:{properties:"distance",orientation:'UNDIRECTED'}})
+```
+
+## Creating graph projection for A start
+
+```
+CALL gds.graph.project(
+    'AstarRoute',
+    'Point',
+    'CONNECTED_TO',
+    {
+        nodeProperties: ['latitude', 'longitude'],
+        relationshipProperties: 'distance'
+    }
+)
+```
+
+## Dijkstra
+
+```
+MATCH (source:Point {latitude: $fromLatitude, longitude: $fromLongitude}), (target:Point {latitude: $toLatitude, longitude: $toLongitude})
+CALL gds.shortestPath.dijkstra.stream('route', {
+sourceNode: source,
+targetNode: target,
+relationshipWeightProperty: 'distance'
+})
+YIELD totalCost, path
+RETURN
+totalCost,
+nodes(path) as path
+```
+
+## Depth First Search algo
+
+```
+MATCH (source:Point {latitude: 56.0382693, longitude: 12.5905274}), (target:Point {latitude: 56.0344608, longitude: 12.5929995})
+CALL gds.dfs.stream('route', {
+  sourceNode: source,
+  targetNodes: target
+})
+YIELD path
+RETURN path
+```
+
+## A start search
+
+```
+MATCH (source:Point {latitude: 56.0382693, longitude: 12.5905274}), (target:Point {latitude: 56.0344608, longitude: 12.5929995})
+CALL gds.shortestPath.astar.stream('AstarRoute', {
+    sourceNode: source,
+    targetNode: target,
+    latitudeProperty: 'latitude',
+    longitudeProperty: 'longitude',
+    relationshipWeightProperty: 'distance'
+})
+YIELD index, sourceNode, targetNode, totalCost, nodeIds, costs, path
+RETURN
+    totalCost,
+    nodes(path) as path
+```
