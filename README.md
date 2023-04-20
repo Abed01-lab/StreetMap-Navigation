@@ -96,7 +96,7 @@ YIELD path
 RETURN path
 ```
 
-## A start search
+## A star search
 
 ```
 MATCH (source:Point {latitude: 56.0382693, longitude: 12.5905274}), (target:Point {latitude: 56.0344608, longitude: 12.5929995})
